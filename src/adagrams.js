@@ -99,9 +99,61 @@ export const usesAvailableLetters = (input, lettersInHand) => {
 };
 
 export const scoreWord = (word) => {
-	// Implement this method for wave 3
+	if (!word || word.length === 0) {
+		return 0;
+	}
+
+	const upper = word.toUpperCase();
+	let score = 0;
+
+	for (let i = 0; i < upper.length; i++) {
+		const letter = upper[i];
+		if ('AEIOULNRST'.includes(letter)) {
+			score += 1;
+		} else if ('DG'.includes(letter)) {
+			score += 2;
+		} else if ('BCMP'.includes(letter)) {
+			score += 3;
+		} else if ('FHVWY'.includes(letter)) {
+			score += 4;
+		} else if (letter === 'K') {
+			score += 5;
+		} else if ('JX'.includes(letter)) {
+			score += 8;
+		} else if ('QZ'.includes(letter)) {
+			score += 10;
+		}
+	}
+
+	if (upper.length >= 7 && upper.length <= 10) {
+		score += 8;
+	}
+
+	return score;
 };
 
 export const highestScoreFrom = (words) => {
-	// Implement this method for wave 4
+	let bestWord = '';
+	let bestScore = 0;
+
+	for (let i = 0; i < words.length; i++) {
+		const currentWord = words[i];
+		const score = scoreWord(currentWord);
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestWord = currentWord;
+		} else if (score === bestScore) {
+			// Apply tie-breaking rules
+			if (bestWord.length === 10) {
+				continue;
+			} else if (currentWord.length === 10) {
+				bestWord = currentWord;
+			} else if (currentWord.length < bestWord.length) {
+				bestWord = currentWord;
+			}
+		}
+	}
+
+	return { word: bestWord, score: bestScore };
 };

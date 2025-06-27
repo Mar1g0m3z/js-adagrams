@@ -26,33 +26,14 @@ const LETTER_FREQUENCY = {
 	Y: 2,
 	Z: 1,
 };
-const LETTER_POOL = []
-	.concat(Array(9).fill('A'))
-	.concat(Array(2).fill('B'))
-	.concat(Array(2).fill('C'))
-	.concat(Array(4).fill('D'))
-	.concat(Array(12).fill('E'))
-	.concat(Array(2).fill('F'))
-	.concat(Array(3).fill('G'))
-	.concat(Array(2).fill('H'))
-	.concat(Array(9).fill('I'))
-	.concat(Array(1).fill('J'))
-	.concat(Array(1).fill('K'))
-	.concat(Array(4).fill('L'))
-	.concat(Array(2).fill('M'))
-	.concat(Array(6).fill('N'))
-	.concat(Array(8).fill('O'))
-	.concat(Array(2).fill('P'))
-	.concat(Array(1).fill('Q'))
-	.concat(Array(6).fill('R'))
-	.concat(Array(4).fill('S'))
-	.concat(Array(6).fill('T'))
-	.concat(Array(4).fill('U'))
-	.concat(Array(2).fill('V'))
-	.concat(Array(2).fill('W'))
-	.concat(Array(1).fill('X'))
-	.concat(Array(2).fill('Y'))
-	.concat(Array(1).fill('Z'));
+
+const buildLetterPool = () => {
+	return Object.entries(LETTER_FREQUENCY).flatMap(([letter, freq]) =>
+		Array(freq).fill(letter)
+	);
+};
+
+const LETTER_POOL = buildLetterPool();
 
 export const drawLetters = () => {
 	const hand = [];
@@ -62,19 +43,12 @@ export const drawLetters = () => {
 		const randomIndex = Math.floor(Math.random() * LETTER_POOL.length);
 		const letter = LETTER_POOL[randomIndex];
 
-		// Count how many times letter appears in hand
 		if (!handCounts[letter]) {
 			handCounts[letter] = 1;
-		} else {
-			handCounts[letter]++;
-		}
-
-		// Only add if we haven't exceeded allowed frequency in the pool
-		const letterMax = LETTER_POOL.filter((l) => l === letter).length;
-		if (handCounts[letter] <= letterMax) {
 			hand.push(letter);
-		} else {
-			handCounts[letter]--; // undo overdraw yeeet
+		} else if (handCounts[letter] < LETTER_FREQUENCY[letter]) {
+			handCounts[letter]++;
+			hand.push(letter);
 		}
 	}
 
@@ -82,7 +56,6 @@ export const drawLetters = () => {
 };
 
 export const usesAvailableLetters = (input, lettersInHand) => {
-	// Implement this method for wave 2
 	const handCopy = lettersInHand.slice();
 	const upperInput = input.toUpperCase();
 
@@ -136,20 +109,14 @@ export const highestScoreFrom = (words) => {
 	let bestWord = '';
 	let bestScore = 0;
 
-	for (let i = 0; i < words.length; i++) {
-		const currentWord = words[i];
+	for (const currentWord of words) {
 		const score = scoreWord(currentWord);
 
 		if (score > bestScore) {
 			bestScore = score;
 			bestWord = currentWord;
-		} else if (score === bestScore) {
-			// Apply tie-breaking rules
-			if (bestWord.length === 10) {
-				continue;
-			} else if (currentWord.length === 10) {
-				bestWord = currentWord;
-			} else if (currentWord.length < bestWord.length) {
+		} else if (score === bestScore && bestWord.length !== 10) {
+			if (currentWord.length === 10 || currentWord.length < bestWord.length) {
 				bestWord = currentWord;
 			}
 		}

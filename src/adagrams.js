@@ -36,20 +36,20 @@ const buildLetterPool = () => {
 const LETTER_POOL = buildLetterPool();
 
 export const drawLetters = () => {
+	const bag = buildLetterPool(); // Flat list of all available letter tiles
 	const hand = [];
-	const handCounts = {};
 
-	while (hand.length < 10) {
-		const randomIndex = Math.floor(Math.random() * LETTER_POOL.length);
-		const letter = LETTER_POOL[randomIndex];
+	for (let i = 0; i < 10; i++) {
+		const randIndex = Math.floor(Math.random() * bag.length);
+		const letter = bag[randIndex];
 
-		if (!handCounts[letter]) {
-			handCounts[letter] = 1;
-			hand.push(letter);
-		} else if (handCounts[letter] < LETTER_FREQUENCY[letter]) {
-			handCounts[letter]++;
-			hand.push(letter);
-		}
+		[bag[randIndex], bag[bag.length - 1]] = [
+			bag[bag.length - 1],
+			bag[randIndex],
+		];
+		bag.pop();
+
+		hand.push(letter);
 	}
 
 	return hand;
@@ -105,22 +105,4 @@ export const scoreWord = (word) => {
 	return score;
 };
 
-export const highestScoreFrom = (words) => {
-	let bestWord = '';
-	let bestScore = 0;
 
-	for (const currentWord of words) {
-		const score = scoreWord(currentWord);
-
-		if (score > bestScore) {
-			bestScore = score;
-			bestWord = currentWord;
-		} else if (score === bestScore && bestWord.length !== 10) {
-			if (currentWord.length === 10 || currentWord.length < bestWord.length) {
-				bestWord = currentWord;
-			}
-		}
-	}
-
-	return { word: bestWord, score: bestScore };
-};

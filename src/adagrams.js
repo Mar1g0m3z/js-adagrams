@@ -33,8 +33,6 @@ const buildLetterPool = () => {
 	);
 };
 
-const LETTER_POOL = buildLetterPool();
-
 export const drawLetters = () => {
 	const bag = buildLetterPool(); // Flat list of all available letter tiles
 	const hand = [];
@@ -71,31 +69,42 @@ export const usesAvailableLetters = (input, lettersInHand) => {
 	return true;
 };
 
+const LETTER_SCORES = {
+	A: 1,
+	B: 3,
+	C: 3,
+	D: 2,
+	E: 1,
+	F: 4,
+	G: 2,
+	H: 4,
+	I: 1,
+	J: 8,
+	K: 5,
+	L: 1,
+	M: 3,
+	N: 1,
+	O: 1,
+	P: 3,
+	Q: 10,
+	R: 1,
+	S: 1,
+	T: 1,
+	U: 1,
+	V: 4,
+	W: 4,
+	X: 8,
+	Y: 4,
+	Z: 10,
+};
 export const scoreWord = (word) => {
-	if (!word || word.length === 0) {
-		return 0;
-	}
+	if (!word) return 0;
 
 	const upper = word.toUpperCase();
 	let score = 0;
 
-	for (let i = 0; i < upper.length; i++) {
-		const letter = upper[i];
-		if ('AEIOULNRST'.includes(letter)) {
-			score += 1;
-		} else if ('DG'.includes(letter)) {
-			score += 2;
-		} else if ('BCMP'.includes(letter)) {
-			score += 3;
-		} else if ('FHVWY'.includes(letter)) {
-			score += 4;
-		} else if (letter === 'K') {
-			score += 5;
-		} else if ('JX'.includes(letter)) {
-			score += 8;
-		} else if ('QZ'.includes(letter)) {
-			score += 10;
-		}
+	for (const letter of upper) {
+		score += LETTER_SCORES[letter] || 0;
 	}
 
 	if (upper.length >= 7 && upper.length <= 10) {
@@ -104,5 +113,22 @@ export const scoreWord = (word) => {
 
 	return score;
 };
+export const highestScoreFrom = (words) => {
+	let bestWord = '';
+	let bestScore = 0;
 
+	for (const currentWord of words) {
+		const score = scoreWord(currentWord);
 
+		if (score > bestScore) {
+			bestScore = score;
+			bestWord = currentWord;
+		} else if (score === bestScore && bestWord.length !== 10) {
+			if (currentWord.length === 10 || currentWord.length < bestWord.length) {
+				bestWord = currentWord;
+			}
+		}
+	}
+
+	return { word: bestWord, score: bestScore };
+};
